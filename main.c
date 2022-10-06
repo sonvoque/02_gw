@@ -59,7 +59,7 @@ Topology description:
 #define SHOW_FULL_DB            0
 
 /* if using simulation: set to TRUE to reduce the sim time */
-#define USING_LESS_RETRANS_CONF 0
+#define USING_LESS_RETRANS_CONF 1
 
 #if (USING_LESS_RETRANS_CONF)
 #define MAX_TIMEOUT             5           // seconds for a long chain topology 60 nodes: 5s
@@ -1614,7 +1614,7 @@ int main(int argc, char* argv[]) {
                             if (node_db_list[emergency_node].async_seq < emergency_reply.seq) {                                
                                 memcpy(&env_db, emergency_reply.arg, sizeof(env_db));
                                 //get rssi
-                                node_db_list[emergency_node].rssi = rx_reply.arg[22];
+                                //node_db_list[emergency_node].rssi = rx_reply.arg[22];
 
                                 // update sensor data and print them
                                 update_sensor_data(emergency_node, env_db);                
