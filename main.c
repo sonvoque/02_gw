@@ -37,14 +37,15 @@ Topology description:
 #include <sys/types.h>
 #include <ifaddrs.h>
 
-//#ifdef USING_SQL_SERVER
-#include <mysql/mysql.h>
-//#endif
 
 //#include "sls.h"
-//#include "sls_cli.h"     
+#include "sls_cli.h"     
 #include "util.h"      
 
+
+#if USING_SQL_SERVER_ENABLE
+#include <mysql/mysql.h>
+#endif
 
 
 #define BUFSIZE 2048
@@ -122,10 +123,11 @@ static void process_gw_cmd(cmd_struct_t cmd, int nodeid);
 
 
 /* database functions */
+#if USING_SQL_SERVER_ENABLE
 static void finish_with_error(MYSQL *con);
 static void get_db_row(MYSQL_ROW row, int i);
 static int  execute_sql_cmd(char *sql);
-
+#endif
 
 static void show_sql_db();
 static void show_local_db();
@@ -137,6 +139,8 @@ static void update2_sql_row(int nodeid);
 static void update3_sql_row(int nodeid);
 static void update_sql_row(int nodeid);
 static void update_sql_sensor(int nodeid);
+
+
 
 static int  execute_broadcast_cmd(cmd_struct_t cmd, int val, int mode);
 static int  execute_multicast_cmd(cmd_struct_t cmd);
@@ -168,6 +172,8 @@ struct timeval t0, t1;
 time_t rawtime;
 struct tm *timeinfo;
 
+
+#if USING_SQL_SERVER_ENABLE
 MYSQL *con;
 char *sql_cmd; 
 
@@ -176,19 +182,20 @@ static char sql_server_ipaddr[20] ="localhost";
 static char sql_username[20]= "root";
 static char sql_password[20]= "Son100480";
 static char sql_db[20] = "sls_db";
+#endif
+
 static char sim_gw_ipv6[40] = "aaaa::c30c:0:0:1"; 
 
-
 /*------------------------------------------------*/
+#if (USING_SQL_SERVER_ENABLE)   
 void finish_with_error(MYSQL *con) {
-#if (USING_SQL_SERVER_ENABLE==1)   
     fprintf(stderr, "%s\n", mysql_error(con));
     mysql_close(con);
     //exit(1);        
-#endif
 }
+#endif
 
-
+/*------------------------------------------------*/
 void show_network_topo() {
     printf("\n");
     printf("NETWORK TOPOLOGY \n");
@@ -201,7 +208,7 @@ void show_network_topo() {
 }
 
 /*------------------------------------------------*/
-#if (USING_SQL_SERVER_ENABLE==1) 
+#if (USING_SQL_SERVER_ENABLE) 
 void get_db_row(MYSQL_ROW row, int i) {
     node_db_list[i].index       = atoi(row[0]);
     node_db_list[i].id          = atoi(row[1]);
