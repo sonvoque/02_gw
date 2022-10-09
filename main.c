@@ -191,7 +191,6 @@ static char sim_gw_ipv6[40] = "aaaa::c30c:0:0:1";
 void finish_with_error(MYSQL *con) {
     fprintf(stderr, "%s\n", mysql_error(con));
     mysql_close(con);
-    //exit(1);        
 }
 #endif
 
@@ -238,7 +237,6 @@ void gen_app_key_for_node(int nodeid) {
     gen_random_key_128(byte_array);
     convert_array2str(byte_array,sizeof(byte_array),&result);
     strcpy(node_db_list[nodeid].app_key, result);
-    //printf(" - Key for node %2d: \033[1;32m %s \033[0m\n", nodeid, node_db_list[nodeid].app_key);
 }
 
 /*------------------------------------------------*/
@@ -266,11 +264,8 @@ void init_main() {
         node_db_list[i].next_hop_addr[6]=0x00;
         node_db_list[i].next_hop_addr[7]=0x00;
     }
-    
     update_sql_db();
-
     printf("... DONE \n\n");
-    //show_sql_db();
 }
 
 
@@ -381,7 +376,6 @@ void update2_sql_row(int nodeid) {
     if (execute_sql_cmd(sql)!=0){
         printf("Update SQL failed: sql_cmd = %s\n", sql);
     }    
-    //free(result);    
 #endif    
 }
 
@@ -687,7 +681,6 @@ int read_node_list(){
             sscanf(buf,"%d %s",&node, ipv6_addr);
             node_db_list[num_of_node].id = node;
             strcpy(node_db_list[node].ipv6_addr, ipv6_addr);
-            //printf("node = %d,   ipv6 = %s\n",node, node_db_list[node].ipv6_addr);
             num_of_node++;
             }
         fclose(ptr_file);
@@ -719,9 +712,7 @@ void check_ip_interface(){
     printf( "Check IP interfaces: \n");
     if (getifaddrs(&ifaddr) == -1)    {
         perror("getifaddrs");
-        //exit(EXIT_FAILURE);
     }
-
 
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
         if (ifa->ifa_addr == NULL)
@@ -732,7 +723,6 @@ void check_ip_interface(){
         if((strcmp(ifa->ifa_name,"ens33")==0)&&(ifa->ifa_addr->sa_family==AF_INET)) {
             if (s != 0) {
                 printf("getnameinfo() failed: %s\n", gai_strerror(s));
-                //exit(EXIT_FAILURE);
             }
             printf("- Interface: <\033[1;33m%s\033[0m> Address: \033[1;33m%s\033[0m \n",ifa->ifa_name, host);
         }
@@ -740,25 +730,22 @@ void check_ip_interface(){
         if((strcmp(ifa->ifa_name,"lo")==0)&&(ifa->ifa_addr->sa_family==AF_INET)) {
             if (s != 0) {
                 printf("getnameinfo() failed: %s\n", gai_strerror(s));
-                //exit(EXIT_FAILURE);
             }
             printf("- Interface: <\033[1;33m%s\033[0m> Address: \033[1;33m%s\033[0m \n",ifa->ifa_name, host);
         }
 
     }
-
     freeifaddrs(ifaddr);
-    //exit(EXIT_SUCCESS);
 }
 
 
 /*------------------------------------------------*/
 boolean is_broadcast_command(cmd_struct_t cmd) {
-    return cmd.len = 0xFF;
+    return (cmd.len = 0xFF);
 }
 
 boolean is_multicast_command(cmd_struct_t cmd) {
-    return cmd.len = 0xFE;
+    return (cmd.len = 0xFE);
 }
 
 /*------------------------------------------------*/
@@ -782,7 +769,6 @@ boolean is_node_connected(int node) {
 
 /*------------------------------------------------*/
 int execute_sql_cmd(char *sql) {
-
 #if (USING_SQL_SERVER_ENABLE) 
     con = mysql_init(NULL);
 
@@ -1000,7 +986,7 @@ int execute_broadcast_cmd(cmd_struct_t cmd, int val, int mode) {
     for (i = 1; i < num_of_node; i++) {
         /* prepare tx_cmd to send to RF nodes*/
         tx_cmd.type = cmd.type;
-        tx_cmd.cmd = cmd.cmd;     // CMD_LED_ON;
+        tx_cmd.cmd = cmd.cmd;     
         tx_cmd.arg[0] = val;
         tx_cmd.err_code = 0;
 
